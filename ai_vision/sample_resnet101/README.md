@@ -102,6 +102,8 @@ or # You can launch with qrb ros camera
 ros2 launch sample_resnet101 launch_with_qrb_ros_camera.py
 or # You can launch with usb_cam (USB webcam)
 ros2 launch sample_resnet101 launch_with_usb_cam.py
+or # You can launch with Orbbec camera (USB)
+ros2 launch sample_resnet101 launch_with_orbbec_camera.py
 ```
 
 > **Note:** For `usb_cam`, image quality parameters (`brightness`, `contrast`, `saturation`, `sharpness`, `gain`, and `focus`) default to `-1` (camera driver defaults). Override them as launch arguments to tune for your USB camera, for example:

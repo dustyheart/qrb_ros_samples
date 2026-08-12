@@ -116,6 +116,9 @@ ros2 launch sample_hand_detection launch_with_qrb_ros_camera.py model_path:=/opt
 
 # Launch the sample hand detection node with usb_cam (USB webcam)
 ros2 launch sample_hand_detection launch_with_usb_cam.py model_path:=/opt/model/
+
+# Launch the sample hand detection node with Orbbec camera (USB)
+ros2 launch sample_hand_detection launch_with_orbbec_camera.py model_path:=/opt/model/
 ```
 
 > **Note:** For `usb_cam`, image quality parameters (`brightness`, `contrast`, `saturation`, `sharpness`, `gain`, and `focus`) default to `-1` (camera driver defaults). Override them as launch arguments to tune for your USB camera, for example:
@@ -171,6 +174,9 @@ source install/setup.bash
 ros2 launch sample_hand_detection launch_with_qrb_ros_camera.py model_path:=/opt/model/
 # Or launch with usb_cam (USB webcam)
 ros2 launch sample_hand_detection launch_with_usb_cam.py model_path:=/opt/model/
+
+# Or launch with Orbbec camera (USB)
+ros2 launch sample_hand_detection launch_with_orbbec_camera.py model_path:=/opt/model/
 ```
 
 > **Note:** For `usb_cam`, image quality parameters (`brightness`, `contrast`, `saturation`, `sharpness`, `gain`, and `focus`) default to `-1` (camera driver defaults). Override them as launch arguments to tune for your USB camera, for example:

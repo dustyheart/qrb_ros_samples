@@ -135,6 +135,9 @@ ros2 launch sample_object_detection launch_with_qrb_ros_camera.py model:=/opt/mo
 
 # Or use usb_cam (USB webcam)
 ros2 launch sample_object_detection launch_with_usb_cam.py model:=/opt/model/yolov8_det_qcs9075.bin
+
+# Or use Orbbec camera (USB)
+ros2 launch sample_object_detection launch_with_orbbec_camera.py model:=/opt/model/yolov8_det_qcs9075.bin
 ```
 
 > **Note:** For `usb_cam`, image quality parameters (`brightness`, `contrast`, `saturation`, `sharpness`, `gain`, and `focus`) default to `-1` (camera driver defaults). Override them as launch arguments to tune for your USB camera, for example:
