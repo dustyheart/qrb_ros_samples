@@ -62,6 +62,10 @@ The `sample_resnet101` is a Python-based ROS node that performs image classifica
     <th>GMSL Camera Support</th>
     <td>LI-VENUS-OX03F10-OAX40-GM2A-118H(YUV)</td>
   </tr>
+  <tr>
+    <th>Camera Support</th>
+    <td>Orbbec Gemini 335L (USB)</td>
+  </tr>
 </table>
 
 

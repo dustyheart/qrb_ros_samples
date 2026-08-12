@@ -70,6 +70,11 @@ The model is sourced from [**MediaPipe Hand Landmark Detector**](https://aihub.q
     <td>LI-VENUS-OX03F10-OAX40-GM2A-118H(YUV)</td>
     <td>LI-VENUS-OX03F10-OAX40-GM2A-118H(YUV)</td>
   </tr>
+  <tr>
+    <th>Camera Support</th>
+    <td>Orbbec Gemini 335L (USB)</td>
+    <td>Orbbec Gemini 335L (USB)</td>
+  </tr>
 </table>
 
 ---
