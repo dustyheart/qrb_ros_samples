@@ -59,6 +59,10 @@ The `sample_apriltag` is the ROS package to provide AprilTag pipeline samples fo
     <th>Hardware Overview</th>
     <th><a href="https://www.qualcomm.com/products/internet-of-things/industrial-processors/iq9-series/iq-9075"><img src="https://s7d1.scene7.com/is/image/dmqualcommprod/dragonwing-IQ-9075-EVK?$QC_Responsive$&fmt=png-alpha" width="160"></a></th>
   </tr>
+  <tr>
+    <th>Camera Support</th>
+    <td>Orbbec Gemini 335L (USB)</td>
+  </tr>
 </table>
 
 
@@ -152,6 +156,17 @@ detections:
 ```
 
 We can see it detected tag: `tagStandard41h12` and the tag id is `1`.
+
+### Start with an Orbbec USB camera
+
+If you use a USB Orbbec camera (e.g. Gemini 335L) instead of a MIPI camera, launch the Orbbec variant. It subscribes to `orbbec_camera` directly (RGB8 + `camera_info`) and skips `qrb_ros_camera` / color-space conversion, so Wayland/weston is not required:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 launch sample_apriltag sample_apriltag_orbbec.launch.py
+```
+
+> **Note:** This launch requires the `orbbec_camera` package (`ros-jazzy-orbbec-camera`). You may also need to install the Orbbec udev rules so the camera can be opened without root privileges.
 
 ### How to change camera id
 
