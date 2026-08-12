@@ -66,6 +66,11 @@ Ultralytics YOLOv8 is a machine learning model that predicts bounding boxes, seg
     <td>LI-VENUS-OX03F10-OAX40-GM2A-118H(YUV)</td>
     <td>LI-VENUS-OX03F10-OAX40-GM2A-118H(YUV)</td>
   </tr>
+  <tr>
+    <th>Camera Support</th>
+    <td>Orbbec Gemini 335L (USB)</td>
+    <td>Orbbec Gemini 335L (USB)</td>
+  </tr>
 </table>
 
 
