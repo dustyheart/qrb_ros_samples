@@ -126,6 +126,14 @@ ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local vi
 
 > **Note:** Pass `video_path:=0` (or `/dev/video0`) to `launch_with_video.py` to use a live camera instead of a file. Keep the publish rate low (1~3 Hz) — NPU inference is serial, so a higher rate just causes frame drops.
 
+- To run PPE detection from a **live USB (V4L2) camera** (recommended for real cameras — exposes resolution / frame rate / pixel format controls), install the USB camera driver and launch:
+```bash
+sudo apt install -y ros-jazzy-usb-cam
+ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
+```
+
+> **Note:** Defaults are `640x480 @ 30`, `pixel_format:=yuyv2rgb` (widest webcam compatibility). For a 720p/1080p webcam use MJPEG, e.g. `ros2 launch sample_ppe_detection launch_with_camera.py image_width:=1280 image_height:=720 pixel_format:=mjpeg2rgb`. The node self-throttles to NPU speed and drops surplus frames.
+
 </details>
 
 <details>
