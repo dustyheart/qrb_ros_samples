@@ -1,0 +1,251 @@
+
+
+<div>
+  <h1>AI Sample PPE Detection</h1>
+  <p align="center">
+  </p>
+</div>
+
+<img src="https://github.com/dustyheart/qrb_ros_samples/blob/gif/ai_vision/sample_ppe_detection/resource/ppe_result.gif" width="640"/>
+
+---
+
+## 👋 Overview
+
+- This sample detects **PPE (Personal Protective Equipment)** — currently **helmet** and **vest** — from an input image or video stream. It bridges an incoming `/image_raw` (`sensor_msgs/Image`) topic to the QRB ROS NN Inference node, runs the model on the Qualcomm **NPU (HTP)** via QNN, and publishes annotated detection results.
+- The model is a **Gear Guard Net** detection model, provided as a precompiled **QNN context binary** (`gear_guard_net_ctx.bin`). The sample performs letterbox preprocessing, sends the tensor to `qrb_ros_nn_inference`, then post-processes the output tensors (dequantize → confidence filter → per-class NMS) and publishes an annotated image on `/ppe_detection/image` plus a JSON result on `/ppe_detection/result`.
+
+```mermaid
+flowchart LR
+    A["Image source<br/>(image_publisher /<br/>publish_test_video)"] -->|/image_raw| B["ppe_detection_node<br/>(letterbox preprocess)"]
+    B -->|/qrb_inference_input_tensor| C["qrb_ros_nn_inference<br/>(NPU / HTP inference)"]
+    C -->|/qrb_inference_output_tensor| D["ppe_detection_node<br/>(dequantize / NMS / box-hold)"]
+    D -->|/ppe_detection/image| E["Annotated image"]
+    D -->|/ppe_detection/result| F["JSON result"]
+```
+
+| Node Name | Function |
+| --------- | -------- |
+| [image publisher](https://github.com/ros-perception/image_publisher) | Publishes a local image file to a ROS topic at a fixed rate. |
+| publish_test_video | Reads a video file (or a live camera `/dev/videoX`) and publishes frames to `/image_raw` at a low, NPU-friendly rate. |
+| sample ppe detection | Subscribes to input images for letterbox preprocessing, sends tensors to the NN inference node, then post-processes (dequantize / NMS / box-hold) and publishes annotated results. |
+| [qrb ros nn interface](https://github.com/qualcomm-qrb-ros/qrb_ros_nn_inference) | Loads a trained AI model, receives preprocessed images, performs inference on the NPU, and publishes output tensors. |
+
+## 🔎 Table of contents
+
+- [👋 Overview](#-overview)
+- [🔎 Table of contents](#-table-of-contents)
+- [⚓ Used ROS Topics](#-used-ros-topics)
+- [🎯 Supported targets](#-supported-targets)
+- [✨ Installation](#-installation)
+- [🚀 Usage](#-usage)
+- [👨‍💻 Prerequisites](#-prerequisites)
+- [👨‍💻 Build from source](#-build-from-source)
+- [👨‍💻 Visualization](#-visualization)
+- [🤝 Contributing](#-contributing)
+- [❤️ Contributors](#️-contributors)
+- [❔ FAQs](#-faqs)
+- [📜 License](#-license)
+
+## ⚓ Used ROS Topics
+
+| ROS Topic | Type | Description |
+| --------- | ---- | ----------- |
+| `/image_raw` | `<sensor_msgs.msg.Image>` | Input image / video frame |
+| `/qrb_inference_input_tensor` | `<qrb_ros_tensor_list_msgs.msg.TensorList>` | Preprocessed (letterboxed, NHWC uint8) input tensor |
+| `/qrb_inference_output_tensor` | `<qrb_ros_tensor_list_msgs.msg.TensorList>` | Raw model output tensors (`boxes`, `scores`, `class_idx`) |
+| `/ppe_detection/image` | `<sensor_msgs.msg.Image>` | Annotated image with drawn bounding boxes |
+| `/ppe_detection/result` | `<std_msgs.msg.String>` | JSON detection result (`count` + per-box `label` / `score` / `box`) |
+
+## 🎯 Supported targets
+
+<table>
+  <tr>
+    <th>Development Hardware</th>
+    <th>Hardware Overview</th>
+  </tr>
+  <tr>
+    <td>Qualcomm Dragonwing™ IQ-9075 EVK</td>
+    <td>
+      <a href="https://www.qualcomm.com/products/internet-of-things/industrial-processors/iq9-series/iq-9075">
+        <img src="https://s7d1.scene7.com/is/image/dmqualcommprod/dragonwing-IQ-9075-EVK?$QC_Responsive$&fmt=png-alpha" width="160">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Qualcomm Dragonwing™ IQ-8275 EVK</td>
+    <td>
+      <a href="https://www.qualcomm.com/internet-of-things/products/iq8-series/iq-8275">
+        <img src="https://s7d1.scene7.com/is/image/dmqualcommprod/IQ8?$QC_Responsive$&fmt=png-alpha" width="160">
+      </a>
+    </td>
+  </tr>
+</table>
+
+## ✨ Installation
+
+> [!IMPORTANT]
+> The following steps need to be run on **Qualcomm Ubuntu** and **ROS Jazzy**.<br>
+> Refer to [Install Ubuntu on Qualcomm IoT Platforms](https://ubuntu.com/download/qualcomm-iot) and [Install ROS Jazzy](https://docs.ros.org/en/jazzy/index.html) to setup environment. <br>
+> For Qualcomm Linux, please check out the [Qualcomm Intelligent Robotics Product SDK](https://docs.qualcomm.com/bundle/publicresource/topics/80-70018-265/introduction_1.html?vproduct=1601111740013072&version=1.4&facet=Qualcomm%20Intelligent%20Robotics%20Product%20(QIRP)%20SDK) documents.
+
+- Add qcom ppa repository source:
+```bash
+sudo add-apt-repository ppa:ubuntu-qcom-iot/qcom-ppa
+sudo add-apt-repository ppa:ubuntu-qcom-iot/qirp
+sudo apt update
+```
+
+- Install the PPE detection Debian package:
+```bash
+sudo apt install -y ros-jazzy-sample-ppe-detection
+```
+
+## 🚀 Usage
+<details>
+  <summary>Debian package usage details</summary>
+
+> [!IMPORTANT]
+> The model must be a **precompiled QNN context binary** (`.bin`), **NOT** the raw `.dlc` file. The default model path is `/opt/model/gear_guard_net_ctx.bin`. See [Prerequisites](#-prerequisites) for how to obtain / convert it.
+
+- Run PPE detection on a single image:
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py
+```
+
+- You can replace this with a custom image file or model path:
+```bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
+```
+
+- You can also run PPE detection on a video stream (or a live camera):
+```bash
+ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
+```
+
+> **Note:** Pass `video_path:=0` (or `/dev/video0`) to `launch_with_video.py` to use a live camera instead of a file. Keep the publish rate low (1~3 Hz) — NPU inference is serial, so a higher rate just causes frame drops.
+
+</details>
+
+<details>
+  <summary>Build from source usage details</summary>
+
+## 👨‍💻 Prerequisites
+
+- Prepare the PPE detection model. The node expects a **precompiled QNN context binary** at `/opt/model/gear_guard_net_ctx.bin`. If you only have the raw `.dlc` model, convert it to a context binary:
+```bash
+sudo mkdir -p /opt/model
+qnn-context-binary-generator \
+    --backend /usr/lib/libQnnHtp.so \
+    --model /usr/lib/libQnnModelDlc.so \
+    --dlc_path <your_model.dlc> \
+    --binary_file gear_guard_net_ctx \
+    --output_dir /opt/model
+```
+
+- Add qcom ppa repository source:
+```bash
+sudo add-apt-repository ppa:ubuntu-qcom-iot/qcom-ppa
+sudo add-apt-repository ppa:ubuntu-qcom-iot/qirp
+sudo apt update
+```
+
+- Install QRB ROS packages:
+```bash
+sudo apt install -y ros-jazzy-qrb-ros-nn-inference ros-jazzy-qrb-ros-tensor-list-msgs ros-jazzy-image-publisher
+sudo apt install -y ros-dev-tools
+sudo rosdep init
+rosdep update
+```
+
+## 👨‍💻 Build from source
+
+- Download source code from the qrb-ros-sample repository:
+```bash
+mkdir -p ~/qrb_ros_sample_ws/src && cd ~/qrb_ros_sample_ws/src
+git clone -b jazzy-rel https://github.com/qualcomm-qrb-ros/qrb_ros_samples.git
+```
+
+- Build the sample from source code:
+```bash
+cd ~/qrb_ros_sample_ws/src/qrb_ros_samples/ai_vision/sample_ppe_detection
+
+rosdep install --from-paths . --ignore-src --rosdistro jazzy -y --skip-keys "qrb_ros_nn_inference"
+source /opt/ros/jazzy/setup.bash
+colcon build
+source install/setup.bash
+```
+
+- Run PPE detection on a single image:
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py
+```
+
+- You can replace this with a custom image file or model path:
+```bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
+```
+
+- You can also run PPE detection on a video stream (or a live camera):
+```bash
+ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
+```
+
+</details>
+
+## 👨‍💻 Visualization
+
+- You can then check the ROS topic `/ppe_detection/image` in rqt.
+Please refer to the [ROS 2 Jazzy documentation](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Introducing-Turtlesim/Introducing-Turtlesim.html) to install rqt.
+
+- Alternatively, inspect the JSON result directly from the command line:
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 topic echo /ppe_detection/result
+```
+
+## 🤝 Contributing
+
+We love community contributions! Get started by reading our [CONTRIBUTING.md](CONTRIBUTING.md).<br>
+Feel free to create an issue for bug reports, feature requests, or any discussion 💡.
+
+## ❤️ Contributors
+
+Thanks to all our contributors who have helped make this project better!
+
+<table>
+  <tr>
+    <td style="text-align: center;">
+      <a href="https://github.com/hangshen">
+        <img src="https://github.com/hangshen.png" width="100" height="100" alt="Hang Shen"/>
+        <br />
+        <sub><b>Hang Shen</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+## ❔ FAQs
+
+<details>
+<summary>Why is the publish rate so low (1~3 Hz)?</summary><br>
+NPU (HTP) inference is serial — one frame is processed at a time. Publishing faster than the NPU can consume just causes frame drops (the node warns and skips frames while a previous frame is still being processed). Keep the publish rate low to match actual inference throughput.
+</details>
+
+<details>
+<summary>Detections flicker between frames. How can I stabilize them?</summary><br>
+The node includes a temporal "box-hold" mechanism: if a class is missed in the current frame, it reuses the most recent detected box for up to <code>box_hold_frames</code> frames. Increase this value (via <code>launch_with_video.py</code>) to hold boxes longer, or set it to <code>0</code> to disable.
+</details>
+
+<details>
+<summary><code>ERROR: Model format NOT support!</code> when loading the inference node</summary><br>
+<code>nn_inference_node</code> loads a <b>precompiled context binary</b> only; on-the-fly <code>.dlc</code> compilation is not supported. Convert the model to a <code>.bin</code> context binary first (see <a href="#-prerequisites">Prerequisites</a>). The <code>.bin</code> is tied to a specific backend (HTP version) and must be regenerated for every new model or hardware platform.
+</details>
+
+
+## 📜 License
+
+Project is licensed under the [BSD-3-Clause-Clear](https://spdx.org/licenses/BSD-3-Clause-Clear.html) License. See [LICENSE](./LICENSE) for the full license text.
