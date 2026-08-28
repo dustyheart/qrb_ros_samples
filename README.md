@@ -126,21 +126,7 @@ ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
 
 </details>
 
-<details>
-  <summary>Build from source usage details</summary>
-
 ## 👨‍💻 Prerequisites
-
-- Prepare the PPE detection model. The node expects a **precompiled QNN context binary** at `/opt/model/gear_guard_net_ctx.bin`. If you only have the raw `.dlc` model, convert it to a context binary:
-```bash
-sudo mkdir -p /opt/model
-qnn-context-binary-generator \
-    --backend /usr/lib/libQnnHtp.so \
-    --model /usr/lib/libQnnModelDlc.so \
-    --dlc_path <your_model.dlc> \
-    --binary_file gear_guard_net_ctx \
-    --output_dir /opt/model
-```
 
 - Add qcom ppa repository source:
 ```bash
@@ -151,10 +137,35 @@ sudo apt update
 
 - Install QRB ROS packages:
 ```bash
-sudo apt install -y ros-jazzy-qrb-ros-nn-inference ros-jazzy-qrb-ros-tensor-list-msgs ros-jazzy-image-publisher
+sudo apt install -y ros-jazzy-qrb-ros-nn-inference ros-jazzy-qrb-ros-tensor-list-msgs ros-jazzy-image-publisher ros-jazzy-usb-cam
 sudo apt install -y ros-dev-tools
 sudo rosdep init
 rosdep update
+```
+
+- Export the **Gear Guard Net** model from [Qualcomm AI Hub](https://aihub.qualcomm.com/models/gear_guard_net) as a QNN DLC. The model detects **helmet / vest** and takes a `320x192` (HxW) RGB input:
+```bash
+pip install qai-hub-models
+# Get your API token from https://aihub.qualcomm.com (Account → Settings) and configure it once:
+qai-hub configure --api_token <YOUR_AI_HUB_API_TOKEN>
+# Run `qai-hub list-devices` to see valid --device names, then export a QNN DLC:
+python -m qai_hub_models.models.gear_guard_net.export \
+    --target-runtime qnn_dlc \
+    --device "<your target device>"
+```
+> The exported `gear_guard_net.dlc` is written under the `build/` directory.
+
+- Set up the QAIRT environment following the [QAIRT general setup guide](https://docs.qualcomm.com/doc/80-63442-10/topic/general_setup.html).
+
+- Convert the DLC to a **QNN context binary**. The node loads `/opt/model/gear_guard_net_ctx.bin` by default. The context binary is tied to a specific HTP backend, so regenerate it on / for each target platform:
+```bash
+sudo mkdir -p /opt/model
+qnn-context-binary-generator \
+    --backend /usr/lib/libQnnHtp.so \
+    --model /usr/lib/libQnnModelDlc.so \
+    --dlc_path <path/to/gear_guard_net.dlc> \
+    --binary_file gear_guard_net_ctx \
+    --output_dir /opt/model
 ```
 
 ## 👨‍💻 Build from source
@@ -190,8 +201,6 @@ ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<you
 ```bash
 ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
 ```
-
-</details>
 
 ## 👨‍💻 Visualization
 
