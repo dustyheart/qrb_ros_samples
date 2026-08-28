@@ -89,17 +89,7 @@ flowchart LR
 > Refer to [Install Ubuntu on Qualcomm IoT Platforms](https://ubuntu.com/download/qualcomm-iot) and [Install ROS Jazzy](https://docs.ros.org/en/jazzy/index.html) to setup environment. <br>
 > For Qualcomm Linux, please check out the [Qualcomm Intelligent Robotics Product SDK](https://docs.qualcomm.com/bundle/publicresource/topics/80-70018-265/introduction_1.html?vproduct=1601111740013072&version=1.4&facet=Qualcomm%20Intelligent%20Robotics%20Product%20(QIRP)%20SDK) documents.
 
-- Add qcom ppa repository source:
-```bash
-sudo add-apt-repository ppa:ubuntu-qcom-iot/qcom-ppa
-sudo add-apt-repository ppa:ubuntu-qcom-iot/qirp
-sudo apt update
-```
-
-- Install the PPE detection Debian package:
-```bash
-sudo apt install -y ros-jazzy-sample-ppe-detection
-```
+- Build the sample from source. See [Prerequisites](#-prerequisites) and [Build from source](#-build-from-source) below.
 
 ## 🚀 Usage
 <details>
