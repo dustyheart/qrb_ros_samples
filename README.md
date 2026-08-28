@@ -40,7 +40,7 @@ flowchart LR
 - [✨ Installation](#-installation)
 - [🚀 Usage](#-usage)
   - [👨‍💻 Prerequisites](#-prerequisites)
-- [👨‍💻 Build from source](#-build-from-source)
+  - [👨‍💻 Build from source](#-build-from-source)
 - [👨‍💻 Visualization](#-visualization)
 - [🤝 Contributing](#-contributing)
 - [❤️ Contributors](#️-contributors)
@@ -169,7 +169,7 @@ ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
 
 </details>
 
-## 👨‍💻 Build from source
+### 👨‍💻 Build from source
 
 - Download source code from the qrb-ros-sample repository:
 ```bash
