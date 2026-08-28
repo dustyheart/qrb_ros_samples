@@ -39,7 +39,7 @@ flowchart LR
 - [🎯 Supported targets](#-supported-targets)
 - [✨ Installation](#-installation)
 - [🚀 Usage](#-usage)
-- [👨‍💻 Prerequisites](#-prerequisites)
+  - [👨‍💻 Prerequisites](#-prerequisites)
 - [👨‍💻 Build from source](#-build-from-source)
 - [👨‍💻 Visualization](#-visualization)
 - [🤝 Contributing](#-contributing)
@@ -92,41 +92,8 @@ flowchart LR
 - Build the sample from source. See [Prerequisites](#-prerequisites) and [Build from source](#-build-from-source) below.
 
 ## 🚀 Usage
-<details>
-  <summary>Debian package usage details</summary>
 
-> [!IMPORTANT]
-> The model must be a **precompiled QNN context binary** (`.bin`), **NOT** the raw `.dlc` file. The default model path is `/opt/model/gear_guard_net_ctx.bin`. See [Prerequisites](#-prerequisites) for how to obtain / convert it.
-
-- Run PPE detection on a single image:
-```bash
-source /opt/ros/jazzy/setup.bash
-ros2 launch sample_ppe_detection launch_with_image_publisher.py
-```
-
-- You can replace this with a custom image file or model path:
-```bash
-ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
-```
-
-- You can also run PPE detection on a video stream (or a live camera):
-```bash
-ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
-```
-
-> **Note:** Pass `video_path:=0` (or `/dev/video0`) to `launch_with_video.py` to use a live camera instead of a file. Keep the publish rate low (1~3 Hz) — NPU inference is serial, so a higher rate just causes frame drops.
-
-- To run PPE detection from a **live USB (V4L2) camera** (recommended for real cameras — exposes resolution / frame rate / pixel format controls), install the USB camera driver and launch:
-```bash
-sudo apt install -y ros-jazzy-usb-cam
-ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
-```
-
-> **Note:** Defaults are `640x480 @ 30`, `pixel_format:=yuyv2rgb` (widest webcam compatibility). For a 720p/1080p webcam use MJPEG, e.g. `ros2 launch sample_ppe_detection launch_with_camera.py image_width:=1280 image_height:=720 pixel_format:=mjpeg2rgb`. The node self-throttles to NPU speed and drops surplus frames.
-
-</details>
-
-## 👨‍💻 Prerequisites
+### 👨‍💻 Prerequisites
 
 - Add qcom ppa repository source:
 ```bash
@@ -167,6 +134,40 @@ qnn-context-binary-generator \
     --binary_file gear_guard_net_ctx \
     --output_dir /opt/model
 ```
+
+<details>
+  <summary>Debian package usage details</summary>
+
+> [!IMPORTANT]
+> The model must be a **precompiled QNN context binary** (`.bin`), **NOT** the raw `.dlc` file. The default model path is `/opt/model/gear_guard_net_ctx.bin`. See [Prerequisites](#-prerequisites) for how to obtain / convert it.
+
+- Run PPE detection on a single image:
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py
+```
+
+- You can replace this with a custom image file or model path:
+```bash
+ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
+```
+
+- You can also run PPE detection on a video stream (or a live camera):
+```bash
+ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
+```
+
+> **Note:** Pass `video_path:=0` (or `/dev/video0`) to `launch_with_video.py` to use a live camera instead of a file. Keep the publish rate low (1~3 Hz) — NPU inference is serial, so a higher rate just causes frame drops.
+
+- To run PPE detection from a **live USB (V4L2) camera** (recommended for real cameras — exposes resolution / frame rate / pixel format controls), install the USB camera driver and launch:
+```bash
+sudo apt install -y ros-jazzy-usb-cam
+ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
+```
+
+> **Note:** Defaults are `640x480 @ 30`, `pixel_format:=yuyv2rgb` (widest webcam compatibility). For a 720p/1080p webcam use MJPEG, e.g. `ros2 launch sample_ppe_detection launch_with_camera.py image_width:=1280 image_height:=720 pixel_format:=mjpeg2rgb`. The node self-throttles to NPU speed and drops surplus frames.
+
+</details>
 
 ## 👨‍💻 Build from source
 
