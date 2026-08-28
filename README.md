@@ -26,7 +26,7 @@ flowchart LR
 
 | Node Name | Function |
 | --------- | -------- |
-| [image publisher](https://github.com/ros-perception/image_publisher) | Publishes a local image file to a ROS topic at a fixed rate. |
+| image publisher | Publishes a local image file to a ROS topic at a fixed rate. |
 | publish_test_video | Reads a video file (or a live camera `/dev/videoX`) and publishes frames to `/image_raw` at a low, NPU-friendly rate. |
 | sample ppe detection | Subscribes to input images for letterbox preprocessing, sends tensors to the NN inference node, then post-processes (dequantize / NMS / box-hold) and publishes annotated results. |
 | [qrb ros nn interface](https://github.com/qualcomm-qrb-ros/qrb_ros_nn_inference) | Loads a trained AI model, receives preprocessed images, performs inference on the NPU, and publishes output tensors. |
