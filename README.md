@@ -216,8 +216,7 @@ ros2 topic echo /ppe_detection/result
 
 ## 🤝 Contributing
 
-We love community contributions! Get started by reading our [CONTRIBUTING.md](CONTRIBUTING.md).<br>
-Feel free to create an issue for bug reports, feature requests, or any discussion 💡.
+We love community contributions! Feel free to create an issue for bug reports, feature requests, or any discussion 💡.
 
 ## ❤️ Contributors
 
