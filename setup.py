@@ -33,10 +33,6 @@ setup(
         'console_scripts': [
             'ppe_detection_node = '
             'sample_ppe_detection.ppe_detection_node:main',
-            'publish_test_picture = '
-            'sample_ppe_detection.publish_test_picture:main',
-            'publish_test_video = '
-            'sample_ppe_detection.publish_test_video:main',
         ],
     },
 )

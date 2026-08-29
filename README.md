@@ -17,7 +17,7 @@
 
 ```mermaid
 flowchart LR
-    A["Image source<br/>(image_publisher /<br/>publish_test_video)"] -->|/image_raw| B["ppe_detection_node<br/>(letterbox preprocess)"]
+    A["Image source<br/>(image_publisher /<br/>usb_cam)"] -->|/image_raw| B["ppe_detection_node<br/>(letterbox preprocess)"]
     B -->|/qrb_inference_input_tensor| C["qrb_ros_nn_inference<br/>(NPU / HTP inference)"]
     C -->|/qrb_inference_output_tensor| D["ppe_detection_node<br/>(dequantize / NMS / box-hold)"]
     D -->|/ppe_detection/image| E["Annotated image"]
@@ -27,7 +27,7 @@ flowchart LR
 | Node Name | Function |
 | --------- | -------- |
 | image publisher | Publishes a local image file to a ROS topic at a fixed rate. |
-| publish_test_video | Reads a video file (or a live camera `/dev/videoX`) and publishes frames to `/image_raw` at a low, NPU-friendly rate. |
+| usb_cam | Captures frames from a live USB (V4L2) camera and publishes them to `/image_raw`. |
 | sample ppe detection | Subscribes to input images for letterbox preprocessing, sends tensors to the NN inference node, then post-processes (dequantize / NMS / box-hold) and publishes annotated results. |
 | [qrb ros nn interface](https://github.com/qualcomm-qrb-ros/qrb_ros_nn_inference) | Loads a trained AI model, receives preprocessed images, performs inference on the NPU, and publishes output tensors. |
 
@@ -152,13 +152,6 @@ ros2 launch sample_ppe_detection launch_with_image_publisher.py
 ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
 ```
 
-- You can also run PPE detection on a video stream (or a live camera):
-```bash
-ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
-```
-
-> **Note:** Pass `video_path:=0` (or `/dev/video0`) to `launch_with_video.py` to use a live camera instead of a file. Keep the publish rate low (1~3 Hz) — NPU inference is serial, so a higher rate just causes frame drops.
-
 - To run PPE detection from a **live USB (V4L2) camera** (recommended for real cameras — exposes resolution / frame rate / pixel format controls), install the USB camera driver and launch:
 ```bash
 sudo apt install -y ros-jazzy-usb-cam
@@ -198,9 +191,10 @@ ros2 launch sample_ppe_detection launch_with_image_publisher.py
 ros2 launch sample_ppe_detection launch_with_image_publisher.py image_path:=<your local image path> model_path:=<your local model path>
 ```
 
-- You can also run PPE detection on a video stream (or a live camera):
+- You can also run PPE detection from a live USB (V4L2) camera:
 ```bash
-ros2 launch sample_ppe_detection launch_with_video.py video_path:=<your local video path> model_path:=<your local model path>
+sudo apt install -y ros-jazzy-usb-cam
+ros2 launch sample_ppe_detection launch_with_camera.py video_device:=/dev/video0
 ```
 
 ## 👨‍💻 Visualization
@@ -244,7 +238,7 @@ NPU (HTP) inference is serial — one frame is processed at a time. Publishing f
 
 <details>
 <summary>Detections flicker between frames. How can I stabilize them?</summary><br>
-The node includes a temporal "box-hold" mechanism: if a class is missed in the current frame, it reuses the most recent detected box for up to <code>box_hold_frames</code> frames. Increase this value (via <code>launch_with_video.py</code>) to hold boxes longer, or set it to <code>0</code> to disable.
+The node includes a temporal "box-hold" mechanism: if a class is missed in the current frame, it reuses the most recent detected box for up to <code>box_hold_frames</code> frames. Increase this value (via <code>launch_with_camera.py</code>) to hold boxes longer, or set it to <code>0</code> to disable.
 </details>
 
 <details>
