@@ -174,7 +174,7 @@ git clone -b jazzy-rel https://github.com/qualcomm-qrb-ros/qrb_ros_samples.git
 ```bash
 cd ~/qrb_ros_sample_ws/src/qrb_ros_samples/ai_vision/sample_ppe_detection
 
-rosdep install --from-paths . --ignore-src --rosdistro jazzy -y --skip-keys "qrb_ros_nn_inference"
+rosdep install --from-paths . --ignore-src --rosdistro jazzy -y --skip-keys "qrb_ros_nn_inference qrb_ros_tensor_list_msgs"
 source /opt/ros/jazzy/setup.bash
 colcon build
 source install/setup.bash
