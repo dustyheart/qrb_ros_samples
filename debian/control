@@ -8,5 +8,5 @@ Standards-Version: 3.9.2
 
 Package: ros-jazzy-sample-ppe-detection
 Architecture: any
-Depends: ${python3:Depends}, ${misc:Depends}, ros-jazzy-launch, ros-jazzy-launch-ros, ros-jazzy-rclpy, ros-jazzy-rclcpp-components, ros-jazzy-cv-bridge, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-qrb-ros-nn-inference, ros-jazzy-qrb-ros-tensor-list-msgs, ros-jazzy-image-publisher, ros-jazzy-usb-cam, python3-numpy, python3-pil, python3-opencv
+Depends: ${python3:Depends}, ${misc:Depends}, ros-jazzy-launch, ros-jazzy-launch-ros, ros-jazzy-ament-index-python, ros-jazzy-rclpy, ros-jazzy-rclcpp-components, ros-jazzy-cv-bridge, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-qrb-ros-nn-inference, ros-jazzy-qrb-ros-tensor-list-msgs, ros-jazzy-image-publisher, ros-jazzy-usb-cam, python3-numpy, python3-pil, python3-opencv
 Description: sample PPE (helmet/vest) detection with Gear Guard Net on Qualcomm NPU
